@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="options-box">
+        <h1>Find Your New NYC Home</h1>
+        <div>
+          <input id="show-listings" type="button" value="Show Listings">
+          <input id="hide-listings" type="button" value="Hide Listings">
+		  </br>
+		  <h2>My Neighborhood</h2>
+		  <input type="text" id="myInput" data-bind="event: {keyup: myFunction()}" placeholder="Search for names.." title="Type in a name">
+		  <uL id="myList" data-bind="foreach: locList">
+			<div data-bind="if: isAvail">
+				<li>
+					<span data-bind="text: title"> </span>
+				</li>
+			</div>
+		  </ul>
+        </div>
+      </div>
+      <div id="map"></div>
+    </div>
+    <script async defer
+        src=
+        "https://maps.googleapis.com/maps/api/js?key=AIzaSyDoAik2zA0i7ExVjK1bvh_nJ17_r_FlcS0&v=3&callback=initMap">
+    </script>
+	<script src="js/lib/knockout-3.4.2.js"></script>
+	<script src="js/map.js"></script>
+  </body>
+</html>
