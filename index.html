@@ -6,21 +6,29 @@
   <body>
     <div class="container">
       <div class="options-box">
-        <h1>Find Your New NYC Home</h1>
+        <h1>My Childhood Neighborhood</h1>
         <div>
-          <input id="show-listings" type="button" value="Show Listings">
-          <input id="hide-listings" type="button" value="Hide Listings">
-		  </br>
-		  <h2>My Neighborhood</h2>
-		  <input type="text" id="myInput" data-bind="event: {keyup: myFunction()}" placeholder="Search for names.." title="Type in a name">
-		  <uL id="myList" data-bind="foreach: locList">
+		  <input type="text" id="myInput" data-bind="event: {keyup: locFilter()}" placeholder="Search for names.." title="Type in a name">
+		  <ul id="myUL" data-bind="foreach: locList">
 			<div data-bind="if: isAvail">
 				<li>
-					<span data-bind="text: title"> </span>
+					<span data-bind="text: title, click: $parent.setCurrentLoc"> </span>
 				</li>
 			</div>
 		  </ul>
         </div>
+		<!-- Locations/Location info divider -->
+		<div class="under-line"></div>
+		<div class="container2"  data-bind="with:currentLoc">
+			<span>Food places near <span id="food-near" data-bind="text: title"> </span></span>
+			<div data-bind="foreach: foodPlacesList">
+				<label>Locale Name:
+					<span id="locInfo" data-bind="text: name"></span>
+				</label>
+				<span id="locInfo" data-bind="text: address"></span>
+				<span id="locInfo" data-bind="text: url"></span>
+			</div>
+		</div>
       </div>
       <div id="map"></div>
     </div>
@@ -28,7 +36,8 @@
         src=
         "https://maps.googleapis.com/maps/api/js?key=AIzaSyDoAik2zA0i7ExVjK1bvh_nJ17_r_FlcS0&v=3&callback=initMap">
     </script>
+	<script src="js/lib/jquery.min.js"></script>
 	<script src="js/lib/knockout-3.4.2.js"></script>
-	<script src="js/map.js"></script>
+	<script async defer src="js/map.js"></script>
   </body>
 </html>

@@ -1,23 +1,21 @@
 var map;
 // Key locations in my neighborhood.
 var locations = [
-    {title: 'Parents House', location: {lat: 42.711220, lng: -71.171221}, isAvail: true},
-    {title: 'Old High School', location: {lat: 42.710649, lng: -71.163017}, isAvail: true},
-    {title: 'Girlfriends House', location: {lat: 42.719901, lng: -71.160803}, isAvail: true},
-    {title: 'Old Middle School', location: {lat: 42.717417, lng: -71.174100}, isAvail: true},
-    {title: 'Pollo Tipico (local restaurant)', location: {lat: 42.715510, lng: -71.164881}, isAvail: true},
-    {title: 'Campagnone Park (Local Park)', location: {lat: 42.709491, lng: -71.160003}, isAvail: true}
+    {title: 'Childhood Home', location: {lat: 42.711220, lng: -71.171221}, isAvail: true, id: 0},
+    {title: 'Old High School', location: {lat: 42.710649, lng: -71.163017}, isAvail: true, id: 1},
+    {title: 'Wifes childhood home', location: {lat: 42.719901, lng: -71.160803}, isAvail: true, id: 2},
+    {title: 'Old Middle School', location: {lat: 42.717417, lng: -71.174100}, isAvail: true, id: 3},
+    {title: 'Pollo Tipico (local restaurant)', location: {lat: 42.715510, lng: -71.164881}, isAvail: true, id: 4},
+    {title: 'Campagnone Park (Local Park)', location: {lat: 42.709491, lng: -71.160003}, isAvail: true, id: 5}
 ];
 
-      // Create a new blank array for all the listing markers.
-      var markers = [];
+// Create a new blank array for all the listing markers.
+var markers = [];
 
       function initMap() {
 
-        // Constructor creates a new map - only center and zoom are required.
+        // Constructor creates a new map.
         map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 42.711220, lng: -71.171221},
-          zoom: 15,
           mapTypeControl: false
         });
 
@@ -42,7 +40,7 @@ var locations = [
             title: title,
             animation: google.maps.Animation.DROP,
             icon: defaultIcon,
-            id: i
+            id: locations[i].id
           });
           // Push the marker to our array of markers.
           markers.push(marker);
@@ -59,9 +57,9 @@ var locations = [
             this.setIcon(defaultIcon);
           });
         }
-
-        document.getElementById('show-listings').addEventListener('click', showListings);
-        document.getElementById('hide-listings').addEventListener('click', hideListings);
+		
+		showAll();
+		
       }
 
       // This function populates the infowindow when the marker is clicked. We'll only allow
@@ -81,7 +79,7 @@ var locations = [
       }
 
       // This function will loop through the markers array and display them all.
-      function showListings() {
+      function showAll() {
         var bounds = new google.maps.LatLngBounds();
         // Extend the boundaries of the map for each marker and display the marker
         for (var i = 0; i < markers.length; i++) {
@@ -91,10 +89,23 @@ var locations = [
         map.fitBounds(bounds);
       }
 
-      // This function will loop through the locations and hide them all.
-      function hideListings() {
+      // This function loops through the markers, 
+	  //and shows the one corresponding to the ID passed.
+      function showLoc(id) {
         for (var i = 0; i < markers.length; i++) {
-          markers[i].setMap(null);
+		  if(markers[i].id == id) {
+			  markers[i].setMap(map);
+		  }
+        }
+      }
+	  
+	  // This function loops through the markers, 
+	  //and hides the one corresponding to the ID passed.
+      function hideLoc(id) {
+        for (var i = 0; i < markers.length; i++) {
+		  if(markers[i].id == id) {
+			  markers[i].setMap(null);
+		  }
         }
       }
 
@@ -112,15 +123,46 @@ var locations = [
         return image;
       }
 	  
+//near by food place of location
+var locFoodInfo = function(location){
+	
+	var array = [];
+	var latLng = location["lat"] + "," + location["lng"];
+	
+	$.getJSON('https://api.foursquare.com/v2/venues/search?ll=' + latLng +'&limit=3&radius=900&categoryId=4d4b7105d754a06374d81259&client_id=PKAHBB1OAX0B000CG5UUYO4BXV0LWQWKFB51EK3XVNFJ2ULS&client_secret=RDPX01C01RHCYASZIKVH5XXMPVFIPLFHFP1D53UR4GUWQD50&v=20140806',
+	function(data) {
+		$.each(data.response.venues, function(i,venues){
+				var temp = '';
+				if(venues.url){
+					temp = venues.url;
+				}else temp=null;
+			
+				array.push({name: venues.name, 
+					address: venues.location.address,
+				url: temp})
+
+		   });
+	}).error(function(e){
+        console.log(e);
+    });
+	
+	return array;
+};
+
+//Location object
 var Loc = function(data) {
 	this.title = ko.observable(data.title);
 	this.location = ko.observable(data.location);
 	this.isAvail = ko.observable(data.isAvail);
+	this.id = ko.observable(data.id);
 	
-}
+	this.foodPlacesList = ko.observableArray(locFoodInfo(data.location));
+	
+};
 
 var viewModel = function() {
 	var self = this;
+	this.currentLoc = ko.observable(null);
 	
 	this.locList = ko.observableArray([]);
 	
@@ -128,20 +170,26 @@ var viewModel = function() {
 		self.locList.push(new Loc(locItem));
 	});
 	
-	this.myFunction = function() {
+	this.locFilter = function() {
 		var input, filter;
+		this.currentLoc(null);
 		input = document.getElementById("myInput");
 		filter = input.value.toUpperCase();
 		
 		for(i = 0; i < this.locList().length; i++) {
 			if (this.locList()[i].title().toUpperCase().indexOf(filter) > -1) {
 				this.locList()[i].isAvail(true);
+				showLoc(this.locList()[i].id());
 			} else {
 				this.locList()[i].isAvail(false);
-
+				hideLoc(this.locList()[i].id());
 			};
 		};
 		
+	};
+	
+	this.setCurrentLoc = function(clickedLoc) {
+		self.currentLoc(clickedLoc);
 	};
 	
 }

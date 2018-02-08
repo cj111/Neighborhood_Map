@@ -3,6 +3,7 @@ html,body {
         height: 100%;
         margin: 0;
         padding: 0;
+		z-index: 1;
       }
 
       .container {
@@ -21,11 +22,6 @@ html,body {
         text-align: center;
       }
 
-      #hide-listings,
-      #show-listings {
-        width: 48%;
-      }
-
       #map {
         bottom:0px;
         height: 100%;
@@ -42,7 +38,9 @@ html,body {
         line-height: 35px;
         padding: 10px 10px 30px 10px;
         text-align: left;
-        width: 340px;
+        width: 362px;
+		position: relative;
+		z-index: -1;
       }
 	  
 * {
@@ -76,6 +74,14 @@ html,body {
   display: block
 }
 
-#myUL li a:hover:not(.header) {
-  background-color: #eee;
+.container2 {
+    height: 100%;
+    position: relative;
+}
+
+.under-line {
+	height: 5px;
+	width: 100%;
+	background-color:#7d97ad;
+	margin-top: 20px;
 }
