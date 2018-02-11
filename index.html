@@ -1,33 +1,40 @@
 <!DOCTYPE html>
 <html>
   <head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>My Childhood Neighborhood</title>
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
     <div class="container">
+	   <!--Side bar -->
       <div class="options-box">
         <h1>My Childhood Neighborhood</h1>
-        <div>
 		  <input type="text" id="myInput" data-bind="event: {keyup: locFilter()}" placeholder="Search for names.." title="Type in a name">
 		  <ul id="myUL" data-bind="foreach: locList">
 			<div data-bind="if: isAvail">
 				<li>
-					<span data-bind="text: title, click: $parent.setCurrentLoc"> </span>
+					<span class="loc" data-bind="text: title, click: $parent.setCurrentLoc"> </span>
 				</li>
 			</div>
 		  </ul>
-        </div>
 		<!-- Locations/Location info divider -->
 		<div class="under-line"></div>
 		<div class="container2"  data-bind="with:currentLoc">
-			<span>Food places near <span id="food-near" data-bind="text: title"> </span></span>
-			<div data-bind="foreach: foodPlacesList">
-				<label>Locale Name:
-					<span id="locInfo" data-bind="text: name"></span>
-				</label>
-				<span id="locInfo" data-bind="text: address"></span>
-				<span id="locInfo" data-bind="text: url"></span>
-			</div>
+			<span class="info-title">Food places near: <span class="info-title" data-bind="text: title"> </span></span>
+			<ul class="locale-detail" data-bind="foreach: foodPlacesList">
+				<il class="fq-list">
+					<div data-bind="if: name"><label>Name:</label>
+					<span class="loc-info" data-bind="text: name"></span></div>
+					<div data-bind="if: address"><label>Address:</label>
+					<span class="loc-info" data-bind="text: address"></span></div>
+					<div data-bind="if: url"><label>Website:</label>
+					<span class="loc-info" data-bind="text: url"></span></div>
+				</li>
+			</ul>
+		    <img class="fq" src="img/logo-foursquare.png" alt="foursquare">
 		</div>
       </div>
       <div id="map"></div>

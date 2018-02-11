@@ -1,4 +1,7 @@
 var map;
+
+
+
 // Key locations in my neighborhood.
 var locations = [
     {title: 'Childhood Home', location: {lat: 42.711220, lng: -71.171221}, isAvail: true, id: 0},
@@ -129,6 +132,8 @@ var locFoodInfo = function(location){
 	var array = [];
 	var latLng = location["lat"] + "," + location["lng"];
 	
+	//Calling Foursquare API to find food places near the specified location.
+	// by using categoryID = Food places
 	$.getJSON('https://api.foursquare.com/v2/venues/search?ll=' + latLng +'&limit=3&radius=900&categoryId=4d4b7105d754a06374d81259&client_id=PKAHBB1OAX0B000CG5UUYO4BXV0LWQWKFB51EK3XVNFJ2ULS&client_secret=RDPX01C01RHCYASZIKVH5XXMPVFIPLFHFP1D53UR4GUWQD50&v=20140806',
 	function(data) {
 		$.each(data.response.venues, function(i,venues){
