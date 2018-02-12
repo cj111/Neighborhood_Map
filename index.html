@@ -1,50 +1,57 @@
 <!DOCTYPE html>
 <html>
-  <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>My Childhood Neighborhood</title>
+    <title>My Childhood Neighborhood</title>
     <link rel="stylesheet" href="css/style.css">
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="container">
-	   <!--Side bar -->
-      <div class="options-box">
-        <h1>My Childhood Neighborhood</h1>
-		  <input type="text" id="myInput" data-bind="event: {keyup: locFilter()}" placeholder="Search for names.." title="Type in a name">
-		  <ul id="myUL" data-bind="foreach: locList">
-			<div data-bind="if: isAvail">
-				<li>
-					<span class="loc" data-bind="text: title, click: $parent.setCurrentLoc"> </span>
-				</li>
-			</div>
-		  </ul>
-		<!-- Locations/Location info divider -->
-		<div class="under-line"></div>
-		<div class="container2"  data-bind="with:currentLoc">
-			<span class="info-title">Food places near: <span class="info-title" data-bind="text: title"> </span></span>
-			<ul class="locale-detail" data-bind="foreach: foodPlacesList">
-				<il class="fq-list">
-					<div data-bind="if: name"><label>Name:</label>
-					<span class="loc-info" data-bind="text: name"></span></div>
-					<div data-bind="if: address"><label>Address:</label>
-					<span class="loc-info" data-bind="text: address"></span></div>
-					<div data-bind="if: url"><label>Website:</label>
-					<span class="loc-info" data-bind="text: url"></span></div>
-				</li>
-			</ul>
-		    <img class="fq" src="img/logo-foursquare.png" alt="foursquare">
-		</div>
-      </div>
-      <div id="map"></div>
+        <!--Side bar -->
+        <div class="options-box">
+            <h1>My Childhood Neighborhood</h1>
+            <!-- Search filter for locations -->
+            <input type="text" id="myInput" data-bind="event: {keyup: locFilter()}" placeholder="Search for location.." title="Type in a name">
+            <ul id="myUL" data-bind="foreach: locList">
+                <div data-bind="if: isAvail">
+                    <li>
+                        <span class="loc" data-bind="text: title, click: $parent.setCurrentLoc"> </span>
+                    </li>
+                </div>
+            </ul>
+            <!-- Locations/Food places info divider -->
+            <div class="under-line"></div>
+            <!-- Error Messages -->
+            <span class="locale-detail" id="error-msg" data-bind="text: fqErrorMsg"></span>
+            <span class="locale-detail" id="error-msg" data-bind="text: googleMapErrorMsg"></span>
+            <!-- Display Food places near location -->
+            <div class="container2" data-bind="with:currentLoc">
+                <span class="info-title">Food places near: <span class="info-title" data-bind="text: title"> </span></span>
+                <ul class="locale-detail" data-bind="foreach: foodPlacesList">
+                    <il class="fq-list">
+                        <div data-bind="if: name"><label>Name:</label>
+                            <span class="loc-info" data-bind="text: name"></span></div>
+                        <div data-bind="if: address"><label>Address:</label>
+                            <span class="loc-info" data-bind="text: address"></span></div>
+                        <div data-bind="if: url"><label>Website:</label>
+                            <span class="loc-info" data-bind="text: url"></span></div>
+                        </li>
+                </ul>
+                <img class="fq" src="img/logo-foursquare.png" alt="foursquare">
+            </div>
+        </div>
+        <!-- Render Map -->
+        <div id="map"></div>
     </div>
-    <script async defer
-        src=
-        "https://maps.googleapis.com/maps/api/js?key=AIzaSyDoAik2zA0i7ExVjK1bvh_nJ17_r_FlcS0&v=3&callback=initMap">
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoAik2zA0i7ExVjK1bvh_nJ17_r_FlcS0&v=3&callback=initMap">
     </script>
-	<script src="js/lib/jquery.min.js"></script>
-	<script src="js/lib/knockout-3.4.2.js"></script>
-	<script async defer src="js/map.js"></script>
-  </body>
+    <script src="js/lib/jquery.min.js"></script>
+    <script src="js/lib/knockout-3.4.2.js"></script>
+    <script async defer src="js/map.js"></script>
+</body>
+
 </html>
