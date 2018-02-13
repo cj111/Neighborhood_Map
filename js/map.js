@@ -109,31 +109,33 @@ function initMap() {
                 icon: defaultIcon,
                 id: locations[i].id
             });
+			
+            // Create a marker per location, and put into markers array.
+            addMarker(marker, defaultIcon, highlightedIcon);
+            
         } catch (error) {
             setErrorMsg(1, "An Error was encountered while rendering markers on Google Maps API");
         } finally {
 
         }
-        // Create a marker per location, and put into markers array.
-
-        // Push the marker to our array of markers.
-        markers.push(marker);
-        // Create an onclick event to open the large infowindow at each marker.
-        marker.addListener('click', function() {
-            populateInfoWindow(this, largeInfowindow);
-        });
-        // Two event listeners - one for mouseover, one for mouseout,
-        // to change the colors back and forth.
-        marker.addListener('mouseover', function() {
-            this.setIcon(highlightedIcon);
-        });
-        marker.addListener('mouseout', function() {
-            this.setIcon(defaultIcon);
-        });
+          
     }
 
     showAll();
 
+}
+
+//Function to Add marker to Markers array with event listeners
+function addMarker(data, defaultIcon, highlightedIcon){
+	
+	// Push the marker to our array of markers.
+    markers.push(data);
+	// Create an onclick event to open the large infowindow at each marker.
+    data.addListener('click', function () { populateInfoWindow(this, largeInfowindow);});
+    // Two event listeners - one for mouseover, one for mouseout,
+    // to change the colors back and forth.
+    data.addListener('mouseover', function() { this.setIcon(highlightedIcon);});
+    data.addListener('mouseout', function() { this.setIcon(defaultIcon);});
 }
 
 // This function populates the infowindow when the marker is clicked. We'll only allow
@@ -203,7 +205,7 @@ function makeIcon(markerColor) {
 var locFoodInfo = function(location) {
 
     var array = [];
-    var latLng = location["lat"] + "," + location["lng"];
+    var latLng = location.lat + "," + location.lng;
 
     //Calling Foursquare API to find food places near the specified location.
     // by using categoryID = Food places
@@ -219,7 +221,7 @@ var locFoodInfo = function(location) {
                     name: venues.name,
                     address: venues.location.address,
                     url: temp
-                })
+                });
 
             });
         }).error(function() {
@@ -266,8 +268,8 @@ var viewModel = function() {
             } else {
                 this.locList()[i].isAvail(false);
                 hideLoc(this.locList()[i].id());
-            };
-        };
+            }
+        }
 
     };
 
@@ -279,6 +281,6 @@ var viewModel = function() {
         populateInfoWindow(markers[clickedLoc.id()], largeInfowindow);
     };
 
-}
+};
 
 ko.applyBindings(new viewModel());
