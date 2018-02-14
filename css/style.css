@@ -98,8 +98,13 @@ label{
 	color: blue;
 }
 
+.fq-list{
+	list-style-type: none;
+}
+
 .fq-list:nth-child(even){
-	border: 1px solid #ddd;
+	padding-top: 12px;
+	padding-bottom: 12px;
 }
 
 .locale-detail{
@@ -113,7 +118,7 @@ padding: 12px;
   display: block;
 }
 
-#error-msg{
+.error-msg{
 	padding: 0px;
 }
 

@@ -15,31 +15,33 @@
         <div class="options-box">
             <h1>My Childhood Neighborhood</h1>
             <!-- Search filter for locations -->
-            <input type="text" id="myInput" data-bind="event: {keyup: locFilter()}" placeholder="Search for location.." title="Type in a name">
+            <input type="text" id="myInput" data-bind="textInput: input, event: {keyup: locFilter()}" placeholder="Search for location.." title="Type in a name">
             <ul id="myUL" data-bind="foreach: locList">
-                <div data-bind="if: isAvail">
+                <span data-bind="if: isAvail">
                     <li>
-                        <span class="loc" data-bind="text: title, click: $parent.setCurrentLoc"> </span>
-                    </li>
-                </div>
+                        <span class="loc" data-bind="text: title, click: setCurrentLoc"> </span>
+                </li>
+                </span>
             </ul>
             <!-- Locations/Food places info divider -->
             <div class="under-line"></div>
             <!-- Error Messages -->
-            <span class="locale-detail" id="error-msg" data-bind="text: fqErrorMsg"></span>
-            <span class="locale-detail" id="error-msg" data-bind="text: googleMapErrorMsg"></span>
+            <span class="locale-detail error-msg" data-bind="text: fqErrorMsg"></span>
+            <span class="locale-detail error-msg" data-bind="text: googleMapErrorMsg"></span>
             <!-- Display Food places near location -->
             <div class="container2" data-bind="with:currentLoc">
                 <span class="info-title">Food places near: <span class="info-title" data-bind="text: title"> </span></span>
                 <ul class="locale-detail" data-bind="foreach: foodPlacesList">
-                    <il class="fq-list">
-                        <div data-bind="if: name"><label>Name:</label>
-                            <span class="loc-info" data-bind="text: name"></span></div>
-                        <div data-bind="if: address"><label>Address:</label>
-                            <span class="loc-info" data-bind="text: address"></span></div>
-                        <div data-bind="if: url"><label>Website:</label>
-                            <span class="loc-info" data-bind="text: url"></span></div>
-                        </li>
+                    <li class="fq-list">
+                        <span data-bind="if: name"><label>Name:</label>
+                            <span class="loc-info" data-bind="text: name"></span></span>
+                        </br>
+                        <span data-bind="if: address"><label>Address:</label>
+                            <span class="loc-info" data-bind="text: address"></span></span>
+                        </br>
+                        <span data-bind="if: url"><label>Website:</label>
+                            <span class="loc-info" data-bind="text: url"></span></span>
+                    </li>
                 </ul>
                 <img class="fq" src="img/logo-foursquare.png" alt="foursquare">
             </div>
@@ -47,11 +49,12 @@
         <!-- Render Map -->
         <div id="map"></div>
     </div>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoAik2zA0i7ExVjK1bvh_nJ17_r_FlcS0&v=3&callback=initMap">
-    </script>
     <script src="js/lib/jquery.min.js"></script>
     <script src="js/lib/knockout-3.4.2.js"></script>
-    <script async defer src="js/map.js"></script>
+    <script src="js/locations.js"></script>
+    <script src="js/map.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoAik2zA0i7ExVjK1bvh_nJ17_r_FlcS0&v=3&callback=initMap" onerror="googleError()">
+    </script>
 </body>
 
 </html>

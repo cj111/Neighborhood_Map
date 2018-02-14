@@ -4,6 +4,12 @@ var map;
 this.googleMapErrorMsg = ko.observable();
 this.fqErrorMsg = ko.observable();
 
+//Current Location
+this.currentLoc = ko.observable(null);
+
+//Observable array of locations
+this.locList = ko.observableArray([]);
+
 function setErrorMsg(id, msg) {
     if (id == 1) {
         this.googleMapErrorMsg(msg);
@@ -12,67 +18,18 @@ function setErrorMsg(id, msg) {
     }
 }
 
-// Key locations in my neighborhood.
-var locations = [{
-        title: 'Childhood Home',
-        location: {
-            lat: 42.711220,
-            lng: -71.171221
-        },
-        isAvail: true,
-        id: 0
-    },
-    {
-        title: 'Old High School',
-        location: {
-            lat: 42.710649,
-            lng: -71.163017
-        },
-        isAvail: true,
-        id: 1
-    },
-    {
-        title: 'Wifes childhood home',
-        location: {
-            lat: 42.719901,
-            lng: -71.160803
-        },
-        isAvail: true,
-        id: 2
-    },
-    {
-        title: 'Old Middle School',
-        location: {
-            lat: 42.717417,
-            lng: -71.174100
-        },
-        isAvail: true,
-        id: 3
-    },
-    {
-        title: 'Pollo Tipico (local restaurant)',
-        location: {
-            lat: 42.715510,
-            lng: -71.164881
-        },
-        isAvail: true,
-        id: 4
-    },
-    {
-        title: 'Campagnone Park (Local Park)',
-        location: {
-            lat: 42.709491,
-            lng: -71.160003
-        },
-        isAvail: true,
-        id: 5
-    }
-];
-
 // Create a new blank array for all the listing markers.
 var markers = [];
 
 var largeInfowindow;
+
+//Marker Colors
+var defaultIcon;
+var highlightedIcon;
+
+function googleError() {
+    setErrorMsg(1, "An Error was encountered while rendering markers on Google Maps API");
+};
 
 function initMap() {
 
@@ -88,11 +45,11 @@ function initMap() {
     }
 
     // Style the markers.
-    var defaultIcon = makeIcon('0091ff');
+    defaultIcon = makeIcon('0091ff');
 
     // Create a "highlighted location" marker color for when the user
     // mouses over the marker.
-    var highlightedIcon = makeIcon('FFFF24');
+    highlightedIcon = makeIcon('FFFF24');
 
     largeInfowindow = new google.maps.InfoWindow();
     // The following group uses the location array to create an array of markers on initialize.
@@ -107,52 +64,62 @@ function initMap() {
                 title: title,
                 animation: google.maps.Animation.DROP,
                 icon: defaultIcon,
-                id: locations[i].id
+                id: locations[i].id,
+                getId: function() {
+                    return this.id;
+                }
             });
-			
+
             // Create a marker per location, and put into markers array.
             addMarker(marker, defaultIcon, highlightedIcon);
-            
+
         } catch (error) {
             setErrorMsg(1, "An Error was encountered while rendering markers on Google Maps API");
         } finally {
 
         }
-          
+
     }
 
     showAll();
 
 }
 
+
 //Function to Add marker to Markers array with event listeners
-function addMarker(data, defaultIcon, highlightedIcon){
-	
-	// Push the marker to our array of markers.
+function addMarker(data, defaultIcon, highlightedIcon) {
+    // Push the marker to our array of markers.
     markers.push(data);
-	// Create an onclick event to open the large infowindow at each marker.
-    data.addListener('click', function () { populateInfoWindow(this, largeInfowindow);});
-    // Two event listeners - one for mouseover, one for mouseout,
-    // to change the colors back and forth.
-    data.addListener('mouseover', function() { this.setIcon(highlightedIcon);});
-    data.addListener('mouseout', function() { this.setIcon(defaultIcon);});
+    // Create an onclick event to open the large infowindow at each marker.
+    data.addListener('click', function() {
+        setCurrentLoc(locList()[this.getId()]);
+        populateInfoWindow(this, largeInfowindow);
+    });
 }
 
 // This function populates the infowindow when the marker is clicked. We'll only allow
 // one infowindow which will open at the marker that is clicked, and populate based
 // on that markers position.
 function populateInfoWindow(marker, infowindow) {
-    // Check to make sure the infowindow is not already opened on this marker.
-    console.log(marker);
+    // Check to make sure the infowindow is not already opened on this marker.	
     if (infowindow.marker != marker) {
+        if (infowindow.marker != null) {
+            infowindow.marker.setIcon(defaultIcon);
+        }
         infowindow.marker = marker;
+        infowindow.marker.setIcon(highlightedIcon);
         infowindow.setContent('<div>' + marker.title + '</div>');
         infowindow.open(map, marker);
         // Make sure the marker property is cleared if the infowindow is closed.
         infowindow.addListener('closeclick', function() {
+            if (infowindow.marker) {
+                infowindow.marker.setIcon(defaultIcon);
+            }
             infowindow.marker = null;
         });
     }
+
+    largeInfowindow = infowindow;
 }
 
 // This function will loop through the markers array and display them all.
@@ -242,45 +209,53 @@ var Loc = function(data) {
 
 };
 
-//View Model
-var viewModel = function() {
-    var self = this;
-    this.currentLoc = ko.observable(null);
+function setCurrentLoc(clickedLoc) {
+    currentLoc(clickedLoc);
+    populateInfoWindow(markers[clickedLoc.id()], largeInfowindow);
+};
 
-    this.locList = ko.observableArray([]);
+//View Model
+var ViewModel = function() {
+
+    this.input = ko.observable("");
 
     locations.forEach(function(locItem) {
-        self.locList.push(new Loc(locItem));
+        locList.push(new Loc(locItem));
     });
 
     //Function gets call as user starts typing, 
     //which continues to filter locations as users keys in values
     this.locFilter = function() {
         var input, filter;
-        this.currentLoc(null);
-        input = document.getElementById("myInput");
-        filter = input.value.toUpperCase();
+        currentLoc(null);
+        //input = document.getElementById("myInput");
+        filter = this.input().toUpperCase();
 
-        for (i = 0; i < this.locList().length; i++) {
-            if (this.locList()[i].title().toUpperCase().indexOf(filter) > -1) {
-                this.locList()[i].isAvail(true);
-                showLoc(this.locList()[i].id());
+        for (i = 0; i < locList().length; i++) {
+            if (locList()[i].title().toUpperCase().indexOf(filter) > -1) {
+                locList()[i].isAvail(true);
+                showLoc(locList()[i].id());
             } else {
-                this.locList()[i].isAvail(false);
-                hideLoc(this.locList()[i].id());
+                locList()[i].isAvail(false);
+                hideLoc(locList()[i].id());
+            }
+        }
+
+        //clear any open infowindow when user filters locations
+        if (largeInfowindow != null) {
+            if (largeInfowindow.marker != null) {
+                largeInfowindow.marker.setIcon(defaultIcon);
+                largeInfowindow.marker = null;
+                largeInfowindow.close();
             }
         }
 
     };
 
-    this.setCurrentLoc = function(clickedLoc) {
-        var highlightedIcon = makeIcon('FFFF24');
-        self.currentLoc(clickedLoc);
-        console.log(clickedLoc.id());
-        console.log(markers[clickedLoc.id()]);
-        populateInfoWindow(markers[clickedLoc.id()], largeInfowindow);
+    function setCurrentLoc(clickedLoc) {
+        setCurrentLoc(clickedLoc);
     };
 
 };
 
-ko.applyBindings(new viewModel());
+ko.applyBindings(new ViewModel());
