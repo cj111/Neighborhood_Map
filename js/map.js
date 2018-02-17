@@ -4,8 +4,10 @@ var map;
 this.googleMapErrorMsg = ko.observable();
 this.fqErrorMsg = ko.observable();
 
-//Current Location
+//Global Variables
 this.currentLoc = ko.observable(null);
+this.hide = ko.observable(false);
+this.show = ko.observable(true);
 
 //Observable array of locations
 this.locList = ko.observableArray([]);
@@ -29,19 +31,22 @@ var highlightedIcon;
 
 function googleError() {
     setErrorMsg(1, "An Error was encountered while rendering markers on Google Maps API");
-};
+}
 
 function initMap() {
 
     try {
         // Constructor creates a new map.
         map = new google.maps.Map(document.getElementById('map'), {
-            mapTypeControl: false
+            mapTypeControl: false,
+            fullscreenControl: true,
+            /*fullscreenControlOptions: {
+            	position: google.maps.ControlPosition.TOP_LEFT
+            }*/
+
         });
     } catch (error) {
         setErrorMsg(1, "An Error was encountered while rendering Google Maps API");
-    } finally {
-
     }
 
     // Style the markers.
@@ -75,8 +80,6 @@ function initMap() {
 
         } catch (error) {
             setErrorMsg(1, "An Error was encountered while rendering markers on Google Maps API");
-        } finally {
-
         }
 
     }
@@ -101,23 +104,30 @@ function addMarker(data, defaultIcon, highlightedIcon) {
 // one infowindow which will open at the marker that is clicked, and populate based
 // on that markers position.
 function populateInfoWindow(marker, infowindow) {
-    // Check to make sure the infowindow is not already opened on this marker.	
-    if (infowindow.marker != marker) {
-        if (infowindow.marker != null) {
-            infowindow.marker.setIcon(defaultIcon);
-        }
-        infowindow.marker = marker;
-        infowindow.marker.setIcon(highlightedIcon);
-        infowindow.setContent('<div>' + marker.title + '</div>');
-        infowindow.open(map, marker);
-        // Make sure the marker property is cleared if the infowindow is closed.
-        infowindow.addListener('closeclick', function() {
-            if (infowindow.marker) {
+
+    //need to catch error in case something is wrong with google api url
+    try {
+        // Check to make sure the infowindow is not already opened on this marker.
+        if (infowindow.marker != marker) {
+            if (infowindow.marker != null) {
                 infowindow.marker.setIcon(defaultIcon);
             }
-            infowindow.marker = null;
-        });
+            infowindow.marker = marker;
+            infowindow.marker.setIcon(highlightedIcon);
+            infowindow.setContent('<div>' + marker.title + '</div>');
+            infowindow.open(map, marker);
+            // Make sure the marker property is cleared if the infowindow is closed.
+            infowindow.addListener('closeclick', function() {
+                if (infowindow.marker) {
+                    infowindow.marker.setIcon(defaultIcon);
+                }
+                infowindow.marker = null;
+            });
+        }
+    } catch (error) {
+        setErrorMsg(1, "An Error was encountered while rendering markers on Google Maps API");
     }
+
 
     largeInfowindow = infowindow;
 }
@@ -212,7 +222,7 @@ var Loc = function(data) {
 function setCurrentLoc(clickedLoc) {
     currentLoc(clickedLoc);
     populateInfoWindow(markers[clickedLoc.id()], largeInfowindow);
-};
+}
 
 //View Model
 var ViewModel = function() {
@@ -228,7 +238,6 @@ var ViewModel = function() {
     this.locFilter = function() {
         var input, filter;
         currentLoc(null);
-        //input = document.getElementById("myInput");
         filter = this.input().toUpperCase();
 
         for (i = 0; i < locList().length; i++) {
@@ -254,6 +263,16 @@ var ViewModel = function() {
 
     function setCurrentLoc(clickedLoc) {
         setCurrentLoc(clickedLoc);
+    }
+
+    this.hideMenu = function() {
+        hide(true);
+        show(false);
+    };
+
+    this.showMenu = function() {
+        hide(false);
+        show(true);
     };
 
 };

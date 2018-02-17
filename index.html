@@ -11,8 +11,10 @@
 
 <body>
     <div class="container">
+        <button class="showMenu" data-bind="click: showMenu, visible: hide">Show Menu</button>
         <!--Side bar -->
-        <div class="options-box">
+        <div class="options-box" data-bind="visible: show">
+            <button data-bind="click: hideMenu">Hide Menu</button>
             <h1>My Childhood Neighborhood</h1>
             <!-- Search filter for locations -->
             <input type="text" id="myInput" data-bind="textInput: input, event: {keyup: locFilter()}" placeholder="Search for location.." title="Type in a name">
